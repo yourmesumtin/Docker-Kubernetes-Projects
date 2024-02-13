@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bitcoin-core-deployment
+  namespace: default
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: bitcoin-core-deployment-label
+  template:
+    metadata:
+      labels:
+        app: bitcoin-core-deployment-label
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+      - name: bitcoin-core
+        image: yourme/bitcoin-core:latest
+        ports:
+        - containerPort: 8332
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
+        volumeMounts:
+        - name: bitcoin-data
+          mountPath: /bitcoin
+      volumes:
+      - name: bitcoin-data
+        persistentVolumeClaim:
+          claimName: bitcoin-data-pvc
