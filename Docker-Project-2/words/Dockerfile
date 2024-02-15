@@ -1,12 +1,14 @@
 # Base image with Java and Maven
-FROM maven:3.8.4-openjdk-11 as builder
+FROM ubuntu:22.04
 WORKDIR /app
-COPY . .
-RUN mvn clean verify
+COPY . ./
+RUN apt-get update -y && \
+    apt-get install default-jre -y && \ 
+    apt-get install maven -y && \
+    apt-get clean && \
+    mvn verify
 
-# Runtime stage
-FROM openjdk:11-jre-slim
-COPY --from=builder /app/target/words.jar /app/words.jar
-WORKDIR /app
+WORKDIR /app/target
+
 CMD ["java", "-Xmx8m", "-Xms8m", "-jar", "words.jar"]
 EXPOSE 8080
